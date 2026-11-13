@@ -1,368 +1,355 @@
-# AI Document Assistant (Project ID: P07)
+# AI Document Assistant (P07)
 
 > **THASMAI INFOTECH Internship Technical Talent Assessment**  
-> **Role Track:** Senior Full-Stack Developer & AI Engineer  
-> **Evaluation ID:** P07 – AI Document Assistant  
-> **Architecture:** Decoupled REST Architecture (React.js Frontend + Python Flask Backend + SQLite Database + PyMuPDF + Scikit-Learn TF-IDF Retrieval)
+> **Project ID:** P07 – AI Document Assistant  
+> **Author:** K DEEKSHA  
 
 ---
 
-## 1. Executive Summary & Objective
+## 1. Project Title
+**AI Document Assistant (P07)** – A full-stack document intelligence and retrieval web application that enables users to upload PDF documents, extract text page-by-page, perform TF-IDF keyword search, and ask questions with precise page citations.
 
-The **AI Document Assistant (P07)** is an enterprise-grade web application engineered to ingest multi-page PDF documents, extract text on a granular page-by-page basis, construct an inverted TF-IDF term matrix, and provide an interactive search and question-answering interface.
+---
 
-The application answers natural language queries with verifiable document citations (exact document name and page number), extracts high-relevance text snippets with highlighted keywords, computes match confidence percentages, and enforces strict fallback handling:
+## 2. Project Overview
+The **AI Document Assistant** is designed to eliminate manual reading across multi-page PDF documents. Users can upload standard PDF files, which the system validates, parses, and indexes page-by-page. Using Scikit-Learn TF-IDF vectorization and cosine similarity, the application retrieves relevant text passages and synthesizes direct answers to natural language questions with source document names and page numbers.
+
+If a query does not match any content in the uploaded documents, the application returns a clear, standard message:
 > *"No relevant information found in the uploaded documents."*
 
-The application runs **100% locally** with zero external API dependencies or paid subscription keys.
+The application runs entirely locally with zero external paid APIs, cloud dependencies, or subscription keys.
 
 ---
 
-## 2. Technology Stack
+## 3. Key Features
+
+- **PDF Document Upload & Validation**
+  - Accepts standard PDF documents up to 25 MB.
+  - Validates file extensions (`.pdf`) and binary magic byte headers (`%PDF-`).
+  - Filename sanitization using `secure_filename()` with unique UUID prefixes to prevent directory traversal.
+  - Safe, non-executable local file storage.
+
+- **Page-by-Page Text Extraction**
+  - High-performance text parsing using **PyMuPDF (`fitz`)**.
+  - Normalizes text spacing while preserving line and page boundaries.
+  - Automatically records word counts and character counts per page.
+
+- **TF-IDF Keyword & Content Search**
+  - Sublinear Term Frequency (TF) and Inverse Document Frequency (IDF) vectorization using Scikit-Learn.
+  - Cosine similarity ranking across page segments.
+  - Snippet generation with highlighted matching terms and relevance percentages.
+
+- **Question & Answer Interface**
+  - Two-tier retrieval ranking (page-level filter followed by sentence-level scoring).
+  - Synthesizes direct extractive answers from top matching sentences.
+  - Explicit source attribution (Document Name and exact Page Number).
+  - Fallback protection: Displays *"No relevant information found in the uploaded documents."* when similarity falls below the confidence threshold.
+
+- **Document Management**
+  - View all indexed documents with page count, file size, word count, and upload date.
+  - Page-by-page document reader modal to inspect extracted raw text.
+  - Cascade deletion: Removes database records, extracted page text, and the physical PDF file.
+
+- **Executive Dashboard**
+  - Live metric counters: Total Documents, Pages Extracted, Words Processed, and Queries Run.
+  - One-click sample document importer (`AI_and_Machine_Learning_Handbook.pdf` and `Thasmai_Company_Policy_2026.pdf`) for instant evaluation.
+  - Recent documents list and live query activity feed.
+
+---
+
+## 4. Technology Stack
 
 | Layer | Technology | Version | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Frontend Framework** | React.js | `18.3.1` | Declarative component UI and responsive SPA routing |
-| **Build Tool** | Vite | `6.x` | Ultra-fast HMR and optimized production bundle |
-| **UI Styling** | Bootstrap & Custom CSS | `5.3.3` | Clean SaaS layout, royal blue/slate color palette |
-| **Icons** | Bootstrap Icons | `1.11.3` | Intuitive contextual iconography |
-| **Backend Framework** | Python Flask | `3.1.3` | Lightweight REST API server with Blueprint modularity |
-| **CORS Middleware** | Flask-CORS | `6.0.5` | Secure cross-origin resource sharing |
+| **Frontend** | React.js | `18.3.1` | Modular Single Page Application (SPA) |
+| **Build Tool** | Vite | `6.x` | Fast development server & optimized production build |
+| **UI Framework** | Bootstrap | `5.3.3` | Clean layout, responsive grid, and modern typography |
+| **Icons** | Bootstrap Icons | `1.11.3` | Contextual icons throughout the interface |
+| **Backend** | Python Flask | `3.1.3` | REST API framework with modular Blueprints |
+| **CORS** | Flask-CORS | `6.0.5` | Cross-Origin Resource Sharing handling |
 | **Database** | SQLite3 | Native | Embedded ACID relational persistence |
-| **PDF Extraction** | PyMuPDF (`fitz`) | `2.1.0` | High-speed C-native text & page layout parsing |
-| **Text Vectorization** | Scikit-Learn | `1.8.0` | TF-IDF Vectorizer with sublinear scaling |
-| **Similarity Metric** | Scikit-Learn | `1.8.0` | Vector space Cosine Similarity calculation |
+| **PDF Extraction** | PyMuPDF (`fitz`) | `2.1.0` | C-level fast PDF text and layout parsing |
+| **Search & Retrieval**| Scikit-Learn | `1.8.0` | TF-IDF Vectorizer and Cosine Similarity calculation |
+| **Numerical Processing**| NumPy / SciPy | `2.4.5` / `1.17.1` | Efficient array operations and matrix math |
 
 ---
 
-## 3. System Architecture
+## 5. System Architecture
+
+The application uses a decoupled client-server architecture:
 
 ```
-                          ┌─────────────────────────────────────────┐
-                          │         React Frontend (Vite)           │
-                          │   Dashboard | Upload | Docs | Ask AI    │
-                          └────────────────────┬────────────────────┘
-                                               │ REST API (JSON / FormData)
-                                               ▼
-                          ┌─────────────────────────────────────────┐
-                          │           Flask Backend Server          │
-                          │        (http://127.0.0.1:5000)          │
-                          └──────┬─────────────┬─────────────┬──────┘
-                                 │             │             │
-                ┌────────────────┘             │             └────────────────┐
-                ▼                              ▼                              ▼
-    ┌───────────────────────┐      ┌───────────────────────┐      ┌───────────────────────┐
-    │  PDF Service (PyMuPDF)│      │ TF-IDF Search & QA    │      │  SQLite DB Storage    │
-    │  - %PDF Magic check   │      │  - Sublinear TF-IDF   │      │  - documents          │
-    │  - Page-by-page text  │      │  - Cosine Similarity  │      │  - document_pages     │
-    │  - Sanitized storage  │      │  - Sentence synthesis │      │  - query_history      │
-    └───────────────────────┘      └───────────────────────┘      └───────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                   React Frontend (Vite)                     │
+│      Dashboard | Upload | My Docs | Ask AI | Search         │
+└──────────────────────────────┬──────────────────────────────┘
+                               │ REST API Calls (JSON / FormData)
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 Python Flask REST API Server                │
+│                     (http://127.0.0.1:5000)                 │
+└──────────────┬───────────────┬───────────────┬──────────────┘
+               │               │               │
+               ▼               ▼               ▼
+      ┌────────────────┐┌──────────────┐┌──────────────┐
+      │  PDF Service   ││TF-IDF Search ││  SQLite DB   │
+      │   (PyMuPDF)    ││   & QA Svc   ││ (Persistent) │
+      └────────────────┘└──────────────┘└──────────────┘
 ```
 
-### Retrieval & Question-Answering Pipeline:
-1. **Document Ingestion**: Uploaded PDF is validated (extension `.pdf`, size $\le 25\text{MB}$, magic bytes `%PDF-`).
-2. **Text Extraction**: PyMuPDF iterates through every page, extracts raw text, cleans formatting, and records word/character counts.
-3. **Database Insertion**: Metadata is stored in `documents` and page texts are stored in `document_pages` with foreign key relations.
-4. **TF-IDF Indexing**:
-   - $\text{TF}(t, d) = 1 + \log(f(t, d))$ for $f(t, d) > 0$
-   - $\text{IDF}(t, D) = \log\left(\frac{1 + |D|}{1 + \text{DF}(t, D)}\right) + 1$
-   - $\text{TF-IDF}(t, d) = \text{TF}(t, d) \times \text{IDF}(t, D)$
-5. **Two-Tier Question Answering**:
-   - **Tier 1 (Page Rank)**: Evaluates page relevance via cosine similarity with the question vector.
-   - **Tier 2 (Sentence Rank & Synthesis)**: Splits top passages into sentences, scores each with hybrid lexical + TF-IDF density, and synthesizes an extractive answer.
-6. **No-Answer Fallback**: If the maximum candidate score fails the confidence threshold ($< 5\%$), the engine safely returns:
-   *"No relevant information found in the uploaded documents."*
+1. **Frontend**: React components manage application state and communicate asynchronously with the backend using the native `fetch` API (`frontend/src/services/api.js`).
+2. **Backend**: Flask organizes routes into modular blueprints (`documents`, `search`, `qa`, `dashboard`). Business logic is encapsulated in dedicated service modules.
+3. **Database**: SQLite stores metadata and extracted text across relational tables with foreign keys and cascade delete support.
 
 ---
 
-## 4. Project Folder Structure
+## 6. Project Folder Structure
 
 ```
-ai_doc_assistant/
+ai-document-assistant/
+│
+├── .gitignore                         # Excludes node_modules, dist, __pycache__, DB files
+├── README.md                          # Project documentation and setup guide
 │
 ├── backend/
+│   ├── app.py                         # Flask application factory, CORS and route registration
+│   ├── requirements.txt               # Backend Python package requirements
+│   ├── test_backend.py                # Automated backend test suite
+│   ├── create_samples.py              # Script to generate sample demo PDFs
+│   │
 │   ├── database/
-│   │   ├── schema.sql                 # SQLite schema definitions & indexes
-│   │   ├── db.py                      # Database connection and init routines
-│   │   └── ai_doc_assistant.db        # SQLite database file
+│   │   ├── db.py                      # Database connection and table initialization
+│   │   └── schema.sql                 # SQLite schema definitions
 │   │
 │   ├── routes/
+│   │   ├── dashboard_routes.py        # Analytics and statistics endpoints
 │   │   ├── document_routes.py         # Upload, list, inspect, delete, import samples
-│   │   ├── search_routes.py           # TF-IDF keyword & phrase search
-│   │   ├── qa_routes.py               # Question answering & query history
-│   │   └── dashboard_routes.py        # Analytics, page count & recent activity
+│   │   ├── qa_routes.py               # Question answering & query history endpoints
+│   │   └── search_routes.py           # TF-IDF keyword search endpoints
 │   │
 │   ├── services/
-│   │   ├── pdf_service.py             # PyMuPDF extraction, validation, word counts
-│   │   ├── search_service.py          # Scikit-learn TF-IDF search & snippet highlighting
-│   │   └── qa_service.py              # Sentence scoring, synthesis & fallback handler
+│   │   ├── pdf_service.py             # PyMuPDF text extraction and validation
+│   │   ├── qa_service.py              # Sentence scoring, synthesis & fallback handler
+│   │   └── search_service.py          # TF-IDF vectorizer and cosine similarity ranking
 │   │
-│   ├── sample_docs/                   # Bundled sample PDFs for instant 1-click evaluation
+│   ├── sample_docs/                   # Bundled sample demonstration PDFs
 │   │   ├── AI_and_Machine_Learning_Handbook.pdf
 │   │   └── Thasmai_Company_Policy_2026.pdf
 │   │
-│   ├── uploads/                       # Storage for uploaded PDF files
-│   ├── app.py                         # Flask application factory, CORS & static serving
-│   ├── requirements.txt               # Backend Python dependencies
-│   ├── create_samples.py              # Generator for sample PDFs
-│   └── test_backend.py                # Automated end-to-end integration test suite
+│   └── uploads/                       # Physical storage folder for uploaded PDFs
+│       └── .gitkeep
 │
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Sidebar.jsx            # Responsive navigation sidebar with badge counts
-│   │   │   ├── Navbar.jsx             # Top bar with backend health indicator
-│   │   │   ├── Notification.jsx       # Success / Error / Warning toast alerts
-│   │   │   ├── StatCard.jsx           # Dashboard metric cards
-│   │   │   ├── SnippetCard.jsx        # Search match card with keyword highlighting
-│   │   │   └── DocumentModal.jsx      # Page-by-page text inspector modal
-│   │   │
-│   │   ├── pages/
-│   │   │   ├── Dashboard.jsx          # Statistics, quick action hero, recent logs
-│   │   │   ├── UploadDocuments.jsx    # Drag-and-drop uploader with validation
-│   │   │   ├── MyDocuments.jsx        # Document repository table with filters
-│   │   │   ├── AskAI.jsx              # Question answering interface with sources
-│   │   │   ├── SearchDocuments.jsx    # TF-IDF deep text search
-│   │   │   └── AboutProject.jsx       # Technical architecture & math foundations
-│   │   │
-│   │   ├── services/
-│   │   │   └── api.js                 # Centralized REST API client
-│   │   │
-│   │   ├── App.jsx                    # Root state coordinator
-│   │   ├── App.css                    # SaaS design system & component styles
-│   │   ├── index.css                  # Global variables & typography
-│   │   └── main.jsx                   # React 18 DOM mount point
-│   │
-│   ├── index.html                     # HTML5 shell with Google Fonts & Bootstrap 5
-│   ├── package.json                   # Frontend dependencies & scripts
-│   └── vite.config.js                 # Vite dev proxy configuration
-│
-└── README.md                          # Comprehensive documentation & evaluation guide
+└── frontend/
+    ├── index.html                     # HTML entry point with Bootstrap CDN
+    ├── package.json                   # Frontend npm dependencies and scripts
+    ├── package-lock.json
+    ├── vite.config.js                 # Vite development proxy configuration
+    │
+    └── src/
+        ├── App.jsx                    # Root state coordinator
+        ├── App.css                    # Custom styles and design tokens
+        ├── index.css                  # Global variables and typography
+        ├── main.jsx                   # React DOM render entry point
+        │
+        ├── components/
+        │   ├── DocumentModal.jsx      # Page-by-page document text reader modal
+        │   ├── Navbar.jsx             # Top bar with backend connectivity status
+        │   ├── Notification.jsx       # Toast alert component
+        │   ├── Sidebar.jsx            # Navigation sidebar with badge counts
+        │   ├── SnippetCard.jsx        # Search result card with highlighted keywords
+        │   └── StatCard.jsx           # Dashboard metric card
+        │
+        ├── pages/
+        │   ├── AboutProject.jsx       # Project specifications and details
+        │   ├── AskAI.jsx              # Question answering interface with citations
+        │   ├── Dashboard.jsx          # Metric cards, quick actions, recent logs
+        │   ├── MyDocuments.jsx        # Document repository table with filters
+        │   ├── SearchDocuments.jsx    # TF-IDF keyword search page
+        │   └── UploadDocuments.jsx    # Drag-and-drop upload zone with validation
+        │
+        └── services/
+            └── api.js                 # Centralized REST API client
 ```
 
 ---
 
-## 5. Step-by-Step Setup Guide (Running in VS Code)
+## 7. Installation and Setup
 
-### Prerequisites:
-- **Python**: 3.10+ (Tested on Python 3.13)
-- **Node.js**: v18+ (Tested on Node.js v24)
-- **Visual Studio Code**
+### Prerequisites
+- **Python**: Version `3.10` or higher (tested on Python 3.13)
+- **Node.js**: Version `18` or higher (tested on Node.js v24)
+- **Git**
+
+### Installation Steps
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Deeksha023/ai-document-assistant.git
+   cd ai-document-assistant
+   ```
+
+2. **Set up the Backend:**
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
+
+3. **Set up the Frontend:**
+   ```bash
+   cd ../frontend
+   npm install
+   ```
 
 ---
 
-### Step 1: Open the Project in VS Code
-1. Launch **Visual Studio Code**.
-2. Click **File > Open Folder...** and select `c:\ai_doc_assistant`.
-3. Open a new terminal in VS Code: `Terminal > New Terminal` (Ctrl + `~`).
+## 8. How to Run the Project
 
----
+For local development, run the backend and frontend in separate terminals.
 
-### Step 2: Set Up and Run the Flask Backend
-In your VS Code terminal:
-
-```powershell
-# Navigate to backend directory
+### Terminal 1 – Run Backend (Flask):
+```bash
 cd backend
-
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Run the automated verification test suite
-python test_backend.py
-
-# Start the Flask Backend Server
 python app.py
 ```
+- Server starts at: **`http://127.0.0.1:5000`**
+- Health check: **`http://127.0.0.1:5000/api/health`**
 
-The terminal will display:
-```
-* Running on http://127.0.0.1:5000
-Starting AI Document Assistant Backend on http://127.0.0.1:5000
-```
-Backend health check is available at: `http://127.0.0.1:5000/api/health`.
-
----
-
-### Step 3: Run the React Frontend (in a 2nd Terminal)
-Open a second terminal in VS Code (`Terminal > New Terminal` or the `+` split button):
-
-```powershell
-# Navigate to frontend directory
+### Terminal 2 – Run Frontend (React Vite):
+```bash
 cd frontend
-
-# Install node packages (if not already installed)
-npm install
-
-# Start Vite React development server
 npm run dev
 ```
+- Web application opens at: **`http://localhost:3000`**
 
-The terminal will display:
-```
-  VITE v6.x ready in 350 ms
-
-  ➜  Local:   http://localhost:3000/
-  ➜  Network: use --host to expose
-```
-
-Open `http://localhost:3000` in Google Chrome or Microsoft Edge.
-
-> **Bonus Single-Server Mode**: If you run `npm run build` inside `frontend`, the Flask backend at `http://127.0.0.1:5000` serves both the frontend SPA and all REST APIs simultaneously!
+*(Note: In development, Vite automatically proxies API requests from `http://localhost:3000/api` to `http://127.0.0.1:5000/api`.)*
 
 ---
 
-## 6. Demonstration Walkthrough (2–3 Minute Script)
+## 9. Application Screenshots
 
-Use this script during your technical talent presentation:
+| Page | Description | Screenshot Preview |
+| :--- | :--- | :---: |
+| **Dashboard** | Overview of indexed documents, pages, queries, and quick actions. | ![Dashboard Screenshot](https://via.placeholder.com/800x450.png?text=Dashboard+View) |
+| **Upload Documents** | Drag-and-drop PDF uploader with file validation and progress indicator. | ![Upload Screenshot](https://via.placeholder.com/800x450.png?text=Upload+Documents+View) |
+| **Document Reader Modal** | Granular page-by-page text inspection and word counts. | ![Document Modal Screenshot](https://via.placeholder.com/800x450.png?text=Document+Inspector+Modal) |
+| **TF-IDF Search** | Keyword and phrase search with matched token highlighting. | ![Search Screenshot](https://via.placeholder.com/800x450.png?text=TF-IDF+Search+Results) |
+| **Ask AI & Q&A** | Question answering with confidence score and page citations. | ![Ask AI Screenshot](https://via.placeholder.com/800x450.png?text=Ask+AI+Question+Answering) |
 
-### Phase 1: Dashboard & System Health (0:00 - 0:40)
-1. Navigate to `http://localhost:3000`.
-2. Highlight the **top navbar status pill**: shows `"Flask Backend Connected"` in green with a live heartbeat pulse.
-3. Show the **Executive Dashboard**: displays Total Documents, Pages Extracted, Words Indexed, and Queries Executed.
-4. Point out the **"Load Sample Documents"** one-click button. Click it:
-   - System immediately imports `AI_and_Machine_Learning_Handbook.pdf` and `Thasmai_Company_Policy_2026.pdf`.
-   - Metrics update live: 6 pages extracted, 1,200+ words tokenized!
+*(Note: Replace placeholder image links with actual screenshots of your running instance as needed.)*
 
-### Phase 2: PDF Upload & Text Extraction (0:40 - 1:15)
-1. Click **Upload Documents** in the sidebar.
-2. Demonstrate the modern drag-and-drop zone. Mention the security validations:
-   - File extension check (`.pdf` only)
-   - 25 MB size boundary
-   - Binary header `%PDF-` signature check
-   - Non-executable sandbox storage
-3. Click **"View"** on `AI_and_Machine_Learning_Handbook.pdf`:
-   - Inspect the **Document Modal**: browse Page 1, Page 2, Page 3 text extracted via PyMuPDF.
-   - Show word count per page and the "Copy Text" button.
+---
 
-### Phase 3: TF-IDF Content Search (1:15 - 1:50)
-1. Click **Search Documents** in the sidebar.
-2. Click the quick chip **"Self-attention transformers"** or type `"transformers attention mechanism"`.
-3. Click **Search**:
-   - Displays ranked match cards.
-   - Top result points directly to `AI_and_Machine_Learning_Handbook.pdf`, **Page 2**, with a high similarity percentage.
-   - The snippet highlights matched tokens (`transformers`, `attention`) using `<mark>` badges.
+## 10. API Documentation
 
-### Phase 4: Ask AI & Strict No-Answer Handling (1:50 - 2:30)
-1. Click **Ask AI** in the sidebar.
-2. Ask: *"What are the standard working hours at Thasmai?"*
-   - Returns synthesized answer: *"Standard working hours at Thasmai Infotech are 9:30 AM to 6:30 PM Indian Standard Time (IST), Monday through Friday..."*
-   - Displays **Source**: `Thasmai_Company_Policy_2026.pdf`, **Page 1**, with a 97% relevance score.
-3. Now test the **Mandatory Fallback**:
-   - Ask: *"What is the recipe for chocolate cake?"*
-   - Returns the exact prompt-specified fallback message:  
+| Method | Endpoint | Description | Request Body / Params |
+| :---: | :--- | :--- | :--- |
+| `GET` | `/api/health` | Health check and server status | None |
+| `GET` | `/api/dashboard/stats` | Aggregated statistics & recent activity | None |
+| `POST` | `/api/documents/upload` | Upload and index a new PDF | `multipart/form-data` (`file`) |
+| `POST` | `/api/documents/import-samples` | Ingest bundled sample demonstration PDFs | None |
+| `GET` | `/api/documents` | Retrieve all indexed documents | None |
+| `GET` | `/api/documents/<id>` | Retrieve full document details and page texts | None |
+| `DELETE`| `/api/documents/<id>` | Delete document, page texts, and physical file | None |
+| `POST` | `/api/search` | Execute TF-IDF search across documents | `{"query": str, "document_id": int, "top_k": int}` |
+| `POST` | `/api/qa/ask` | Ask a question and receive synthesized answer | `{"question": str, "document_id": int}` |
+| `GET` | `/api/qa/history` | Retrieve recent query logs | None |
+
+---
+
+## 11. Database Structure
+
+The project uses an embedded **SQLite** database (`backend/database/ai_doc_assistant.db`) initialized automatically from `schema.sql`.
+
+### Tables:
+
+1. **`documents`**
+   - `id`: Integer primary key (auto-increment).
+   - `filename`: Unique sanitized filename on disk.
+   - `original_name`: User's original uploaded filename.
+   - `file_path`: Storage path of the PDF.
+   - `file_size`: Size of the file in bytes.
+   - `total_pages`: Total pages extracted.
+   - `uploaded_at`: Upload timestamp (`CURRENT_TIMESTAMP`).
+   - `status`: Processing state (`processed`, `error`).
+
+2. **`document_pages`**
+   - `id`: Integer primary key (auto-increment).
+   - `document_id`: Foreign key referencing `documents(id)` with `ON DELETE CASCADE`.
+   - `page_number`: 1-indexed page number.
+   - `page_text`: Extracted and cleaned page text.
+   - `word_count`: Total word count on this page.
+   - `char_count`: Total character count on this page.
+
+3. **`query_history`**
+   - `id`: Integer primary key (auto-increment).
+   - `query_type`: Type of query (`'search'` or `'qa'`).
+   - `query_text`: User question or search keywords.
+   - `result_count`: Number of matching passages found.
+   - `top_document`: Name of best-matching document.
+   - `top_page`: Page number of best match.
+   - `confidence_score`: Relevance score percentage.
+   - `created_at`: Query execution timestamp.
+
+---
+
+## 12. Testing
+
+An automated integration test script is included to verify the backend pipeline end-to-end.
+
+To run the test suite:
+```bash
+cd backend
+python test_backend.py
+```
+
+### What the test suite verifies:
+1. Health check endpoint responsiveness (`GET /api/health`).
+2. Programmatic generation and upload of a multi-page PDF (`POST /api/documents/upload`).
+3. Correct page extraction count via PyMuPDF.
+4. Document listing and metadata retrieval (`GET /api/documents`).
+5. TF-IDF search accuracy with token matching (`POST /api/search`).
+6. Relevant Question Answering with page citations (`POST /api/qa/ask`).
+7. **Irrelevant Question Fallback Verification**: Confirms that non-matching questions strictly return *"No relevant information found in the uploaded documents."*
+8. Document deletion and cleanup verification (`DELETE /api/documents/<id>`).
+
+---
+
+## 13. Known Limitations
+
+1. **Scanned / Image-Only PDFs**: Text extraction relies on PyMuPDF reading digital text streams. Scanned PDFs containing only raster images without an embedded OCR layer will not yield searchable text.
+2. **Complex Table Geometry**: Multi-column tables are extracted as plain text streams rather than fully reconstructed two-dimensional relational tables.
+
+---
+
+## 14. Future Enhancements
+
+1. **Optical Character Recognition (OCR) Integration**: Add a local OCR pipeline (such as Tesseract OCR) to automatically detect and extract text from scanned image PDFs.
+2. **Dense Semantic Embeddings & Hybrid RAG**: Augment lexical TF-IDF search with lightweight local embeddings (e.g., `all-MiniLM-L6-v2`) and a vector store for hybrid lexical-semantic retrieval.
+
+---
+
+## 15. Project Demonstration
+
+Follow these steps for a 2-minute demonstration:
+
+1. **Start both servers** and open `http://localhost:3000`. Confirm the green **"Flask Backend Connected"** badge appears in the top navigation bar.
+2. **Import Sample Documents**: Click **"Load Sample Documents"** on the Dashboard. This immediately imports two bundled PDFs:
+   - `AI_and_Machine_Learning_Handbook.pdf`
+   - `Thasmai_Company_Policy_2026.pdf`
+3. **Inspect Document Text**: Navigate to **My Documents** and click **"View Text"** on a document to open the page-by-page reader modal.
+4. **Run a Search Query**: Navigate to **Search Documents**, enter `"transformers attention mechanism"`, and review the ranked snippets with highlighted matching words and page badges.
+5. **Ask a Valid Question**: Navigate to **Ask AI** and query:
+   - *"What are the standard working hours at Thasmai?"*  
+   - Observe the synthesized answer citing **Page 1** of `Thasmai_Company_Policy_2026.pdf`.
+6. **Verify Fallback Behavior**: In **Ask AI**, ask an unrelated query:
+   - *"What is the recipe for chocolate cake?"*  
+   - Observe the required fallback:  
      **"No relevant information found in the uploaded documents."**
-4. Conclude by opening the **About Project** page to show the mathematical formulation and architecture.
 
 ---
 
-## 7. Database Schema (SQLite)
+## 16. Author Information
 
-### Table: `documents`
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | INTEGER PRIMARY KEY | Auto-incrementing unique identifier |
-| `filename` | TEXT NOT NULL | Sanitized unique storage filename on disk |
-| `original_name` | TEXT NOT NULL | Original upload filename provided by user |
-| `file_path` | TEXT NOT NULL | Absolute disk path to stored PDF |
-| `file_size` | INTEGER NOT NULL | File size in bytes |
-| `total_pages` | INTEGER NOT NULL | Total page count extracted via PyMuPDF |
-| `uploaded_at` | DATETIME | Timestamp of ingestion (UTC/Local) |
-| `status` | TEXT | Processing status (`processed`, `error`) |
-
-### Table: `document_pages`
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | INTEGER PRIMARY KEY | Page record ID |
-| `document_id` | INTEGER NOT NULL | Foreign key referencing `documents(id)` (ON DELETE CASCADE) |
-| `page_number` | INTEGER NOT NULL | 1-indexed document page number |
-| `page_text` | TEXT NOT NULL | Cleaned extracted plain text of the page |
-| `word_count` | INTEGER | Word count on this page |
-| `char_count` | INTEGER | Character count on this page |
-
-### Table: `query_history`
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | INTEGER PRIMARY KEY | Query record ID |
-| `query_type` | TEXT NOT NULL | Type of query: `'search'` or `'qa'` |
-| `query_text` | TEXT NOT NULL | The user's input search query or question |
-| `result_count` | INTEGER | Number of matching snippets found |
-| `top_document` | TEXT | Name of top-ranked document match |
-| `top_page` | INTEGER | Page number of top-ranked document match |
-| `confidence_score` | REAL | Confidence percentage score (0.0 to 100.0) |
-| `created_at` | DATETIME | Timestamp of execution |
-
----
-
-## 8. REST API Reference
-
-| Endpoint | Method | Payload / Params | Description |
-| :--- | :---: | :--- | :--- |
-| `/api/health` | `GET` | None | Service heartbeat and uptime check |
-| `/api/documents/upload` | `POST` | `multipart/form-data` (`file`) | Uploads PDF, validates, extracts pages, stores in DB |
-| `/api/documents/import-samples` | `POST` | None | Ingests bundled sample PDFs for instant testing |
-| `/api/documents` | `GET` | None | Returns list of all uploaded documents with metadata |
-| `/api/documents/<id>` | `GET` | None | Retrieves detailed metadata and all page texts for document |
-| `/api/documents/<id>` | `DELETE` | None | Cascades deletion of pages, document record, and disk file |
-| `/api/search` | `POST` | `{"query": str, "document_id": int, "top_k": int}` | Executes TF-IDF cosine similarity search across pages |
-| `/api/qa/ask` | `POST` | `{"question": str, "document_id": int}` | Synthesizes answer with confidence and source citations |
-| `/api/qa/history` | `GET` | None | Returns recent search and question history log |
-| `/api/dashboard/stats` | `GET` | None | Aggregated counts for documents, pages, words, queries |
-
----
-
-## 9. 10-Day Development Plan
-
-| Day | Milestone | Key Deliverables & Outcomes |
-| :---: | :--- | :--- |
-| **Day 1** | Requirement Analysis & Architecture | Drafted technical specs, defined REST API contracts, established folder structure. |
-| **Day 2** | Database & Environment Setup | Configured SQLite schema, foreign key cascade constraints, verified Python 3.13 & Node.js environments. |
-| **Day 3** | PyMuPDF Extraction Engine | Implemented `pdf_service.py`, `%PDF` magic byte validation, page-by-page text parser, whitespace normalizer. |
-| **Day 4** | TF-IDF Search Engine | Built `search_service.py` using Scikit-Learn `TfidfVectorizer`, sublinear TF, and cosine similarity ranking. |
-| **Day 5** | Question Answering & Synthesis | Built `qa_service.py` with two-tier sentence ranking, hybrid scoring, and strict no-answer fallback. |
-| **Day 6** | Flask REST API Endpoints | Developed modular blueprints: `document_routes`, `search_routes`, `qa_routes`, `dashboard_routes`. |
-| **Day 7** | React Component Foundation | Scaffolded Vite React application, created SaaS layout, responsive Sidebar, Navbar, and StatCard components. |
-| **Day 8** | Frontend Page Development | Implemented Dashboard, Upload Dropzone, My Documents table, Search, Ask AI, and About Project pages. |
-| **Day 9** | End-to-End Integration & Testing | Linked React fetch client to Flask API, created automated test suite `test_backend.py`, generated sample PDFs. |
-| **Day 10** | UI Polishing, Documentation & Viva Prep | Fine-tuned responsive styles, wrote comprehensive README, verified demo script, prepared viva Q&A. |
-
----
-
-## 10. Known Limitations & Future Improvements
-
-### Known Limitations:
-1. **Scanned / Image-Only PDFs**: PyMuPDF extracts native text streams. Scanned PDFs (pure images of text without an embedded OCR layer) return empty text.
-2. **Tabular Data Complexities**: Multi-column tables inside PDFs are extracted as serialized text streams; complex cell relationships are not reconstructed as relational tables.
-
-### Future Improvements:
-1. **Local OCR Pipeline (Tesseract / EasyOCR)**: Integrate Tesseract OCR as a fallback pipeline for scanned document pages so image-based PDFs are automatically converted into searchable text.
-2. **Dense Vector Embeddings & Hybrid RAG**: Augment the TF-IDF lexical search with an open-source local embedding model (e.g. `sentence-transformers/all-MiniLM-L6-v2`) and ChromaDB/FAISS for hybrid dense-sparse retrieval (BM25 + Semantic Embeddings).
-3. **Local LLM Integration (Ollama / Llama.cpp)**: Allow users to connect a local quantized LLM (e.g. Llama 3 or Mistral 7B) through Ollama for generative multi-paragraph synthesis while maintaining 100% data privacy.
-
----
-
-## 11. Technical Viva Questions & Simple Answers
-
-**Q1: What is the difference between PyMuPDF and PyPDF2?**  
-*Answer:* PyMuPDF (fitz) is built on MuPDF, a high-performance C rendering library. It is significantly faster (up to 10–20x) than pure Python libraries like PyPDF2, handles complex fonts and layout streams accurately, and supports granular page-by-page extraction.
-
-**Q2: What is TF-IDF and how does it work in this project?**  
-*Answer:* TF-IDF stands for Term Frequency-Inverse Document Frequency. Term Frequency (TF) measures how often a word appears in a specific document page. Inverse Document Frequency (IDF) discounts ubiquitous words (like "the", "document") that appear in almost all pages. Multiplying them highlights words that are distinctively informative for a specific passage.
-
-**Q3: How does the system compute similarity between a question and document pages?**  
-*Answer:* Both the user question and document pages are converted into normalized numerical vectors in a shared TF-IDF feature space. We then compute the Cosine Similarity (the dot product of the normalized vectors), which measures the angle between them regardless of document length.
-
-**Q4: How does the application prevent hallucinations or irrelevant answers?**  
-*Answer:* The QA engine uses strict extractive synthesis grounded in the top-ranked sentences from the uploaded text. If the maximum similarity score falls below the required confidence threshold ($< 5\%$), the system refuses to guess and outputs: *"No relevant information found in the uploaded documents."*
-
-**Q5: What security measures are implemented for PDF uploads?**  
-*Answer:* 
-1. Filename sanitization via Werkzeug `secure_filename()` and unique UUID prefixes to prevent directory traversal.
-2. File size capping at 25 MB to protect server memory.
-3. Binary header validation checking for the `%PDF-` signature.
-4. Uploaded files are strictly parsed as read-only binary text streams, never executed as scripts.
-
-**Q6: Why use SQLite instead of MongoDB or PostgreSQL for this assessment?**  
-*Answer:* SQLite is self-contained, serverless, zero-configuration, and ACID-compliant. It stores the data locally in a single file (`ai_doc_assistant.db`), ensuring the project can be cloned and run instantly by any evaluator without provisioning database servers or docker containers.
-
+- **Author:** K DEEKSHA  
+- **GitHub:** [@Deeksha023](https://github.com/Deeksha023)  
+- **Project:** THASMAI INFOTECH Internship Technical Talent Assessment (P07 – AI Document Assistant)
