@@ -1,11 +1,3 @@
-# AI Document Assistant (P07)
-
-> **THASMAI INFOTECH Internship Technical Talent Assessment**  
-> **Project ID:** P07 – AI Document Assistant  
-> **Author:** K DEEKSHA  
-
----
-
 ## 1. Project Title
 **AI Document Assistant (P07)** – A full-stack document intelligence and retrieval web application that enables users to upload PDF documents, extract text page-by-page, perform TF-IDF keyword search, and ask questions with precise page citations.
 
