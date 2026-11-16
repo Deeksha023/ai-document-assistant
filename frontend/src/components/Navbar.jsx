@@ -35,9 +35,9 @@ export default function Navbar({ activePage, setActivePage, isOnline, onRefresh,
 
   return (
     <header className="app-navbar">
-      <div className="d-flex align-items-center gap-3">
+      <div className="d-flex align-items-center gap-3 min-w-0">
         <button
-          className="btn btn-sm btn-outline-secondary d-lg-none"
+          className="btn btn-sm btn-outline-secondary d-lg-none rounded-3"
           onClick={toggleMobile}
           aria-label="Toggle Navigation"
         >
@@ -45,7 +45,7 @@ export default function Navbar({ activePage, setActivePage, isOnline, onRefresh,
         </button>
         <div className="page-title-wrap">
           <h1>{meta.title}</h1>
-          <p>{meta.subtitle}</p>
+          <p className="d-none d-md-block">{meta.subtitle}</p>
         </div>
       </div>
 
@@ -53,14 +53,15 @@ export default function Navbar({ activePage, setActivePage, isOnline, onRefresh,
         {/* Backend health status badge */}
         <div className={`status-badge ${isOnline ? 'status-online' : 'bg-danger-subtle text-danger border border-danger-subtle'}`}>
           <span className={isOnline ? 'status-pulse' : 'badge bg-danger p-1 rounded-circle'}></span>
-          <span>{isOnline ? 'Flask Backend Connected' : 'Backend Disconnected'}</span>
+          <span className="d-none d-sm-inline">{isOnline ? 'Flask Backend Connected' : 'Backend Disconnected'}</span>
+          <span className="d-sm-none">{isOnline ? 'Online' : 'Offline'}</span>
         </div>
 
         {/* Refresh button */}
         <button
-          className="btn btn-outline-light text-secondary border rounded-3 btn-sm d-flex align-items-center gap-1"
+          className="btn btn-outline-secondary border rounded-3 btn-sm d-flex align-items-center gap-1 bg-white"
           onClick={onRefresh}
-          title="Refresh Data"
+          title="Synchronize Data"
         >
           <i className="bi bi-arrow-clockwise"></i>
           <span className="d-none d-md-inline">Sync</span>
@@ -69,7 +70,7 @@ export default function Navbar({ activePage, setActivePage, isOnline, onRefresh,
         {/* Quick Upload Action */}
         {activePage !== 'upload' && (
           <button
-            className="btn btn-primary btn-sm rounded-3 d-flex align-items-center gap-2 fw-semibold px-3"
+            className="btn btn-primary btn-sm rounded-3 d-flex align-items-center gap-2 fw-bold px-3 shadow-sm"
             onClick={() => setActivePage('upload')}
           >
             <i className="bi bi-plus-lg"></i>
@@ -80,4 +81,3 @@ export default function Navbar({ activePage, setActivePage, isOnline, onRefresh,
     </header>
   );
 }
-

@@ -181,6 +181,8 @@ export default function App() {
               onInspectDoc={handleInspectDoc}
               onImportSamples={handleImportSamples}
               importingSamples={importingSamples}
+              isOnline={isOnline}
+              onRefresh={loadData}
             />
           )}
 

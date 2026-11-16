@@ -55,7 +55,7 @@ export default function SearchDocuments({ documents, onInspectDoc, onNavigate })
   };
 
   return (
-    <div className="d-flex flex-column gap-4">
+    <div className="d-flex flex-column gap-4" style={{ minWidth: 0, width: '100%' }}>
       {/* Search Input Card */}
       <div className="modern-card">
         <div className="card-header-clean">
@@ -63,7 +63,7 @@ export default function SearchDocuments({ documents, onInspectDoc, onNavigate })
             <i className="bi bi-search text-primary"></i>
             TF-IDF Document Content Search
           </h3>
-          <span className="badge bg-light text-muted border">
+          <span className="badge bg-light text-muted border small">
             Sublinear TF &bull; N-gram (1,2) Cosine Similarity
           </span>
         </div>
@@ -74,7 +74,7 @@ export default function SearchDocuments({ documents, onInspectDoc, onNavigate })
             <div className="col-12 col-md-8">
               <label className="fw-semibold small text-muted mb-1">Target Document Scope:</label>
               <select
-                className="form-select form-select-sm"
+                className="form-select form-select-sm rounded-3"
                 value={selectedDocId}
                 onChange={(e) => setSelectedDocId(e.target.value)}
               >
@@ -87,9 +87,9 @@ export default function SearchDocuments({ documents, onInspectDoc, onNavigate })
               </select>
             </div>
             <div className="col-12 col-md-4">
-              <label className="fw-semibold small text-muted mb-1">Max Snippets (Top-K):</label>
+              <label className="fw-semibold small text-muted mb-1">Maximum Snippets (Top-K):</label>
               <select
-                className="form-select form-select-sm"
+                className="form-select form-select-sm rounded-3"
                 value={topK}
                 onChange={(e) => setTopK(parseInt(e.target.value, 10))}
               >
@@ -101,26 +101,28 @@ export default function SearchDocuments({ documents, onInspectDoc, onNavigate })
           </div>
 
           {/* Search Input Bar */}
-          <div className="input-group input-group-lg shadow-sm rounded-3 overflow-hidden">
-            <span className="input-group-text bg-white border-end-0 text-primary">
+          <div className="input-group input-group-lg shadow-sm rounded-3 overflow-hidden border">
+            <span className="input-group-text bg-white border-0 text-primary ps-3">
               <i className="bi bi-search fs-5"></i>
             </span>
             <input
               type="text"
-              className="form-control border-start-0 border-end-0 ps-0"
-              placeholder="Search terms, phrases, or topics..."
+              className="form-control border-0 ps-1"
+              placeholder="Search keywords, phrases, policies, or technical terms..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={loading}
+              style={{ fontSize: '1rem' }}
             />
             {query && (
               <button
-                className="btn btn-outline-secondary border-start-0 border-end-0 bg-white"
+                className="btn btn-white border-0 text-muted"
                 onClick={() => setQuery('')}
                 type="button"
+                title="Clear input"
               >
-                <i className="bi bi-x fs-5"></i>
+                <i className="bi bi-x-lg"></i>
               </button>
             )}
             <button
@@ -167,7 +169,7 @@ export default function SearchDocuments({ documents, onInspectDoc, onNavigate })
 
       {/* Error Message */}
       {errorMsg && (
-        <div className="alert alert-danger border-danger-subtle d-flex align-items-center gap-2 rounded-3 shadow-sm">
+        <div className="alert alert-danger py-2 px-3 small rounded-3 d-flex align-items-center gap-2 shadow-sm">
           <i className="bi bi-exclamation-circle-fill"></i>
           <span>{errorMsg}</span>
         </div>
@@ -212,18 +214,18 @@ export default function SearchDocuments({ documents, onInspectDoc, onNavigate })
                 ))}
               </div>
             ) : (
-              <div className="text-center py-5">
-                <div className="display-5 text-muted mb-3">
+              <div className="text-center py-5 px-3">
+                <div className="display-5 text-muted mb-2">
                   <i className="bi bi-file-earmark-x"></i>
                 </div>
-                <h5 className="fw-bold text-danger">
+                <h5 className="fw-bold text-dark mb-1">
                   No matching text snippets found for "{searchResults.query}".
                 </h5>
                 <p className="text-muted small mb-3">
                   Try broader keywords or ensure the relevant document has been uploaded.
                 </p>
                 <button
-                  className="btn btn-outline-primary btn-sm rounded-3"
+                  className="btn btn-outline-primary btn-sm rounded-3 px-3"
                   onClick={() => onNavigate('upload')}
                 >
                   <i className="bi bi-upload me-1"></i> Upload More Documents
@@ -236,4 +238,3 @@ export default function SearchDocuments({ documents, onInspectDoc, onNavigate })
     </div>
   );
 }
-

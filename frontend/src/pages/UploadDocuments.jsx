@@ -72,7 +72,7 @@ export default function UploadDocuments({
     setUploading(true);
     setErrorMsg('');
     setSuccessMsg('');
-    setUploadProgressText('Extracting text with PyMuPDF and indexing pages...');
+    setUploadProgressText('Extracting text page-by-page with PyMuPDF and indexing vectors...');
 
     try {
       const response = await api.uploadDocument(selectedFile);
@@ -95,21 +95,21 @@ export default function UploadDocuments({
   };
 
   return (
-    <div className="d-flex flex-column gap-4">
+    <div className="d-flex flex-column gap-4" style={{ minWidth: 0, width: '100%' }}>
       {/* Notifications */}
       {errorMsg && (
-        <div className="alert alert-danger border-danger-subtle d-flex align-items-center gap-2 rounded-3 shadow-sm">
+        <div className="alert alert-danger border-danger-subtle d-flex align-items-center gap-2 rounded-3 shadow-sm py-2 px-3 m-0">
           <i className="bi bi-exclamation-triangle-fill fs-5"></i>
-          <span className="flex-grow-1">{errorMsg}</span>
-          <button className="btn-close" onClick={() => setErrorMsg('')}></button>
+          <span className="flex-grow-1 fw-medium small">{errorMsg}</span>
+          <button className="btn-close btn-sm" onClick={() => setErrorMsg('')}></button>
         </div>
       )}
 
       {successMsg && (
-        <div className="alert alert-success border-success-subtle d-flex align-items-center gap-2 rounded-3 shadow-sm">
+        <div className="alert alert-success border-success-subtle d-flex align-items-center gap-2 rounded-3 shadow-sm py-2 px-3 m-0">
           <i className="bi bi-check-circle-fill fs-5"></i>
-          <span className="flex-grow-1">{successMsg}</span>
-          <button className="btn-close" onClick={() => setSuccessMsg('')}></button>
+          <span className="flex-grow-1 fw-medium small">{successMsg}</span>
+          <button className="btn-close btn-sm" onClick={() => setSuccessMsg('')}></button>
         </div>
       )}
 
@@ -118,10 +118,10 @@ export default function UploadDocuments({
         <div className="card-header-clean">
           <h3>
             <i className="bi bi-cloud-arrow-up-fill text-primary"></i>
-            Upload New PDF Document
+            Upload PDF Document
           </h3>
           <button
-            className="btn btn-sm btn-outline-primary rounded-3 d-flex align-items-center gap-2"
+            className="btn btn-sm btn-outline-primary rounded-3 d-flex align-items-center gap-2 fw-semibold px-3"
             onClick={onImportSamples}
             disabled={importingSamples}
           >
@@ -133,7 +133,7 @@ export default function UploadDocuments({
         <div className="card-body-clean">
           {/* Drag & Drop Zone */}
           <div
-            className={`upload-dropzone ${dragActive ? 'drag-active' : ''}`}
+            className={`upload-dropzone-modern ${dragActive ? 'drag-active' : ''}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
@@ -148,47 +148,41 @@ export default function UploadDocuments({
               onChange={handleFileChange}
             />
 
-            <div className="dropzone-icon">
+            <div className="upload-icon-circle">
               <i className="bi bi-file-earmark-arrow-up"></i>
             </div>
-            <div className="dropzone-title">
-              {selectedFile ? selectedFile.name : 'Choose a PDF file or drag & drop it here'}
-            </div>
-            <div className="dropzone-sub">
+            <h4 className="fw-bold mb-1 text-dark" style={{ fontSize: '1.2rem' }}>
+              {selectedFile ? selectedFile.name : 'Drag & drop your PDF here, or browse files'}
+            </h4>
+            <p className="text-muted small mb-3">
               {selectedFile
-                ? `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB &bull; Ready for extraction`
-                : 'Click to browse your local computer for PDF files'}
-            </div>
+                ? `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB &bull; Ready for automated extraction`
+                : 'Supports multi-page digital PDF files up to 25 MB'}
+            </p>
 
-            <div className="dropzone-specs">
-              <span>
-                <i className="bi bi-check2-circle text-success"></i> PDF files up to 25 MB
-              </span>
-              <span>
-                <i className="bi bi-check2-circle text-success"></i> Automated page-by-page extraction
-              </span>
-              <span>
-                <i className="bi bi-check2-circle text-success"></i> Instant TF-IDF indexing
-              </span>
+            <div className="d-flex justify-content-center gap-3 flex-wrap small text-muted">
+              <span><i className="bi bi-shield-check text-success me-1"></i> Client-Side Validation</span>
+              <span><i className="bi bi-cpu text-primary me-1"></i> PyMuPDF Text Extraction</span>
+              <span><i className="bi bi-database-check text-info me-1"></i> SQLite Persistence</span>
             </div>
           </div>
 
-          {/* Action Row */}
+          {/* Selected File Preview Strip */}
           {selectedFile && (
-            <div className="mt-4 p-3 bg-light rounded-3 border d-flex align-items-center justify-content-between flex-wrap gap-3">
-              <div className="d-flex align-items-center gap-3">
-                <i className="bi bi-file-earmark-pdf-fill text-danger fs-3"></i>
-                <div>
-                  <div className="fw-bold">{selectedFile.name}</div>
-                  <small className="text-muted">
-                    {(selectedFile.size / 1024).toFixed(1)} KB &bull; Type: PDF
-                  </small>
+            <div className="file-preview-strip">
+              <div className="d-flex align-items-center gap-3 min-w-0">
+                <i className="bi bi-file-earmark-pdf-fill text-danger fs-2 flex-shrink-0"></i>
+                <div className="min-w-0">
+                  <div className="fw-bold text-dark text-truncate">{selectedFile.name}</div>
+                  <div className="small text-muted">
+                    {(selectedFile.size / 1024).toFixed(1)} KB &bull; PDF Document
+                  </div>
                 </div>
               </div>
 
-              <div className="d-flex align-items-center gap-2">
+              <div className="d-flex align-items-center gap-2 flex-shrink-0">
                 <button
-                  className="btn btn-outline-secondary btn-sm rounded-3"
+                  className="btn btn-outline-secondary btn-sm rounded-3 px-3"
                   onClick={() => {
                     setSelectedFile(null);
                     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -198,7 +192,7 @@ export default function UploadDocuments({
                   Cancel
                 </button>
                 <button
-                  className="btn btn-primary rounded-3 px-4 fw-bold d-flex align-items-center gap-2"
+                  className="btn btn-primary btn-sm rounded-3 px-4 fw-bold d-flex align-items-center gap-2 shadow-sm"
                   onClick={handleUploadSubmit}
                   disabled={uploading}
                 >
@@ -219,15 +213,15 @@ export default function UploadDocuments({
           )}
 
           {uploading && (
-            <div className="mt-3 text-center text-primary">
-              <div className="spinner-grow spinner-grow-sm text-primary me-2" role="status"></div>
-              <small className="fw-semibold">{uploadProgressText}</small>
+            <div className="mt-3 text-center text-primary p-2 bg-light rounded-3 border">
+              <span className="spinner-grow spinner-grow-sm text-primary me-2" role="status"></span>
+              <span className="fw-semibold small">{uploadProgressText}</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Document Library Preview */}
+      {/* Indexed Document Library Preview */}
       <div className="modern-card">
         <div className="card-header-clean">
           <h3>
@@ -239,8 +233,8 @@ export default function UploadDocuments({
 
         <div className="card-body-clean p-0">
           {documents && documents.length > 0 ? (
-            <div className="table-responsive">
-              <table className="custom-table">
+            <div className="table-responsive-clean">
+              <table className="custom-table-clean">
                 <thead>
                   <tr>
                     <th>Document</th>
@@ -255,34 +249,34 @@ export default function UploadDocuments({
                   {documents.map((doc) => (
                     <tr key={doc.id}>
                       <td>
-                        <div className="d-flex align-items-center gap-2">
-                          <i className="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
-                          <span className="fw-semibold">{doc.original_name}</span>
+                        <div className="doc-name-cell">
+                          <i className="bi bi-file-earmark-pdf-fill text-danger fs-5 flex-shrink-0"></i>
+                          <span className="doc-name-text" title={doc.original_name}>
+                            {doc.original_name}
+                          </span>
                         </div>
                       </td>
                       <td>
-                        <span className="badge bg-primary-subtle text-primary border border-primary-subtle">
+                        <span className="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold">
                           {doc.total_pages} {doc.total_pages === 1 ? 'Page' : 'Pages'}
                         </span>
                       </td>
-                      <td>{doc.formatted_size}</td>
-                      <td>{(doc.total_words || 0).toLocaleString()}</td>
-                      <td>
-                        <small className="text-muted">
-                          {new Date(doc.uploaded_at).toLocaleDateString()}
-                        </small>
+                      <td className="text-muted small">{doc.formatted_size}</td>
+                      <td className="text-muted small">{(doc.total_words || 0).toLocaleString()}</td>
+                      <td className="text-muted small">
+                        {new Date(doc.uploaded_at).toLocaleDateString()}
                       </td>
                       <td className="text-end">
                         <div className="btn-group btn-group-sm">
                           <button
-                            className="btn btn-outline-primary"
+                            className="btn btn-outline-primary rounded-start-2 px-2"
                             onClick={() => onInspectDoc(doc.id)}
-                            title="Inspect text"
+                            title="Inspect page text"
                           >
                             <i className="bi bi-eye me-1"></i> View
                           </button>
                           <button
-                            className="btn btn-outline-danger"
+                            className="btn btn-outline-danger rounded-end-2 px-2"
                             onClick={() => onDeleteDoc(doc.id, doc.original_name)}
                             title="Delete document"
                           >
@@ -296,8 +290,9 @@ export default function UploadDocuments({
               </table>
             </div>
           ) : (
-            <div className="text-center py-4 text-muted">
-              <p className="mb-0">No documents in the repository yet.</p>
+            <div className="text-center py-5 text-muted">
+              <i className="bi bi-folder-x fs-2 d-block mb-2"></i>
+              <p className="mb-0 small">No documents in the repository yet. Upload a PDF above to begin.</p>
             </div>
           )}
         </div>
@@ -305,4 +300,3 @@ export default function UploadDocuments({
     </div>
   );
 }
-

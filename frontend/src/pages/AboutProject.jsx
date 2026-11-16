@@ -2,31 +2,31 @@ import React from 'react';
 
 export default function AboutProject() {
   return (
-    <div className="d-flex flex-column gap-4">
-      {/* Overview Hero */}
+    <div className="d-flex flex-column gap-4" style={{ minWidth: 0, width: '100%' }}>
+      {/* Overview Hero Card */}
       <div className="modern-card p-4">
         <div className="d-flex align-items-center gap-3 mb-3">
-          <div className="p-3 bg-primary-subtle text-primary rounded-3 fs-2">
+          <div className="p-3 bg-primary-subtle text-primary rounded-3 fs-2 flex-shrink-0">
             <i className="bi bi-mortarboard-fill"></i>
           </div>
           <div>
             <div className="badge bg-primary text-white mb-1">PROJECT ID: P07</div>
-            <h3 className="fw-bold m-0">AI Document Assistant</h3>
+            <h3 className="fw-bold m-0 text-dark">DocuMind AI – Document Assistant</h3>
             <p className="text-muted m-0 small">
-              Developed for THASMAI INFOTECH Internship Technical Talent Assessment
+              THASMAI INFOTECH Internship Technical Talent Assessment
             </p>
           </div>
         </div>
 
-        <p className="text-secondary leading-relaxed">
-          The <strong>AI Document Assistant (P07)</strong> is a production-grade full-stack web application
-          engineered to ingest multi-page PDF documents, perform structured page-by-page text extraction,
-          index text using Scikit-Learn TF-IDF vector representations, and provide natural language question answering
-          with precise document citations, confidence scoring, and explicit no-answer handling.
+        <p className="text-secondary leading-relaxed mb-0" style={{ fontSize: '0.94rem' }}>
+          <strong>DocuMind AI</strong> is an enterprise-grade document intelligence platform designed to eliminate
+          tedious manual reading across lengthy multi-page PDF documents. The application ingests documents, performs
+          structured page-by-page text extraction with <strong>PyMuPDF</strong>, calculates <strong>TF-IDF vector representations</strong> with
+          Scikit-Learn, and supports conversational question answering with verifiable page citations, relevance scores, and strict fallback protection.
         </p>
       </div>
 
-      {/* Technology Stack Grid */}
+      {/* Architecture & Engineering Pillars */}
       <div className="row g-3">
         <div className="col-12 col-md-6 col-xl-4">
           <div className="modern-card p-3 h-100">
@@ -36,10 +36,10 @@ export default function AboutProject() {
             </div>
             <ul className="small text-muted mb-0 ps-3">
               <li>React 18 Single Page Application</li>
-              <li>Vite build tool with HMR</li>
+              <li>Vite build tool with instant HMR</li>
               <li>Bootstrap 5.3 & Bootstrap Icons</li>
-              <li>Vanilla modern CSS design system</li>
-              <li>Asynchronous REST API fetch client</li>
+              <li>Custom CSS design tokens</li>
+              <li>Asynchronous REST API client</li>
             </ul>
           </div>
         </div>
@@ -51,11 +51,11 @@ export default function AboutProject() {
               <span>Backend REST APIs</span>
             </div>
             <ul className="small text-muted mb-0 ps-3">
-              <li>Python Flask RESTful micro-framework</li>
+              <li>Python Flask micro-framework</li>
               <li>Flask-CORS cross-origin access</li>
               <li>Werkzeug secure file handling</li>
-              <li>Modular Blueprints (Documents, Search, QA, Stats)</li>
-              <li>Comprehensive error handling & JSON responses</li>
+              <li>Modular Blueprints (Docs, Search, QA, Stats)</li>
+              <li>Comprehensive error handling</li>
             </ul>
           </div>
         </div>
@@ -67,11 +67,11 @@ export default function AboutProject() {
               <span>Database & Storage</span>
             </div>
             <ul className="small text-muted mb-0 ps-3">
-              <li>SQLite relational embedded database</li>
-              <li>Foreign key constraints with cascade deletes</li>
+              <li>SQLite embedded relational DB</li>
+              <li>Foreign key constraints & cascade delete</li>
               <li>Indexed page contents table</li>
-              <li>Query execution analytics & history log</li>
-              <li>Physical filesystem PDF storage</li>
+              <li>Query execution history log</li>
+              <li>Non-executable PDF storage</li>
             </ul>
           </div>
         </div>
@@ -83,11 +83,11 @@ export default function AboutProject() {
               <span>PDF Extraction Engine</span>
             </div>
             <ul className="small text-muted mb-0 ps-3">
-              <li>PyMuPDF (fitz) high-speed parser</li>
-              <li>Multi-page sequential text extraction</li>
+              <li>PyMuPDF (fitz) C-level parser</li>
+              <li>Page-by-page sequential parsing</li>
               <li>Whitespace & line-break normalization</li>
-              <li>Magic byte validation (%PDF header check)</li>
-              <li>Page word and character accounting</li>
+              <li>Binary %PDF magic byte validation</li>
+              <li>Word and character metrics</li>
             </ul>
           </div>
         </div>
@@ -96,7 +96,7 @@ export default function AboutProject() {
           <div className="modern-card p-3 h-100">
             <div className="d-flex align-items-center gap-2 mb-2 text-warning fw-bold">
               <i className="bi bi-cpu-fill fs-4"></i>
-              <span>Search & Retrieval</span>
+              <span>Search & Vectorization</span>
             </div>
             <ul className="small text-muted mb-0 ps-3">
               <li>Scikit-Learn TfidfVectorizer</li>
@@ -117,7 +117,7 @@ export default function AboutProject() {
             <ul className="small text-muted mb-0 ps-3">
               <li>Two-tier page & sentence ranking</li>
               <li>Hybrid TF-IDF + Keyword density scoring</li>
-              <li>Extractive sentence synthesis</li>
+              <li>Grounded extractive sentence synthesis</li>
               <li>Confidence percentage calibration</li>
               <li>Mandatory no-answer fallback protection</li>
             </ul>
@@ -125,21 +125,21 @@ export default function AboutProject() {
         </div>
       </div>
 
-      {/* Mathematical Principles */}
+      {/* Information Cards: Core Principles */}
       <div className="modern-card">
         <div className="card-header-clean">
           <h3>
             <i className="bi bi-calculator text-primary"></i>
-            Mathematical Principles: TF-IDF & Cosine Similarity
+            Retrieval & Retrieval-Augmented Synthesis Principles
           </h3>
         </div>
         <div className="card-body-clean">
           <div className="row g-4">
             <div className="col-12 col-md-6">
-              <h6 className="fw-bold text-dark">Term Frequency - Inverse Document Frequency</h6>
+              <h6 className="fw-bold text-dark">Term Frequency - Inverse Document Frequency (TF-IDF)</h6>
               <p className="small text-muted">
-                TF-IDF quantifies the importance of term <em>t</em> in document passage <em>d</em> relative
-                to corpus <em>D</em>. Sublinear TF applies logarithmic scaling to dampen word frequency dominance:
+                TF-IDF weights words based on how frequently they appear in a specific document page while penalizing
+                common words that appear across all documents. Sublinear TF applies logarithmic scaling:
               </p>
               <div className="p-3 bg-light rounded-3 font-monospace small border">
                 TF(t, d) = 1 + log(f(t, d)) &nbsp; [for f(t, d) &gt; 0]<br />
@@ -149,64 +149,42 @@ export default function AboutProject() {
             </div>
 
             <div className="col-12 col-md-6">
-              <h6 className="fw-bold text-dark">Vector Space Cosine Similarity</h6>
+              <h6 className="fw-bold text-dark">Cosine Similarity Ranking</h6>
               <p className="small text-muted">
-                Measures the cosine angle between query vector <strong>q</strong> and document passage vector <strong>d</strong>,
-                producing an angle-based metric normalized between 0 and 1:
+                Evaluates the cosine of the angle between the query vector and document page vectors in high-dimensional feature space,
+                producing a normalized score between 0 and 1:
               </p>
               <div className="p-3 bg-light rounded-3 font-monospace small border">
                 Cosine Similarity(q, d) = (q &bull; d) / (||q||<sub>2</sub> &times; ||d||<sub>2</sub>)<br />
-                Similarity Score (%) = min(1.0, Score) &times; 100
+                Match Confidence (%) = min(1.0, Score) &times; 100
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Security & Validation Highlights */}
-      <div className="modern-card">
-        <div className="card-header-clean">
-          <h3>
-            <i className="bi bi-shield-lock-fill text-success"></i>
-            Security, Validation & Robustness Safeguards
-          </h3>
-        </div>
-        <div className="card-body-clean">
-          <div className="row g-3">
-            <div className="col-12 col-md-4">
-              <div className="p-3 border rounded-3 bg-light h-100">
-                <div className="fw-bold text-dark mb-1">
-                  <i className="bi bi-file-earmark-check text-success me-1"></i> File Validation
-                </div>
-                <div className="small text-muted">
-                  Strict .pdf extension verification, 25MB file size boundary, and binary '%PDF' magic byte header check.
-                </div>
-              </div>
+      {/* Author & Project Verification Card */}
+      <div className="modern-card p-4">
+        <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <h5 className="fw-bold text-dark mb-1">Developer & Assessment Information</h5>
+            <div className="text-muted small">
+              <strong>Candidate:</strong> K DEEKSHA &bull; <strong>Assessment ID:</strong> P07 (AI Document Assistant)
             </div>
-            <div className="col-12 col-md-4">
-              <div className="p-3 border rounded-3 bg-light h-100">
-                <div className="fw-bold text-dark mb-1">
-                  <i className="bi bi-slash-circle text-danger me-1"></i> Path Sanitization
-                </div>
-                <div className="small text-muted">
-                  UUID prefix generation + Werkzeug secure_filename() prevents path traversal attacks.
-                </div>
-              </div>
+            <div className="text-muted small">
+              <strong>Organization:</strong> THASMAI INFOTECH Technical Talent Assessment
             </div>
-            <div className="col-12 col-md-4">
-              <div className="p-3 border rounded-3 bg-light h-100">
-                <div className="fw-bold text-dark mb-1">
-                  <i className="bi bi-shield-x text-warning me-1"></i> No Execution Policy
-                </div>
-                <div className="small text-muted">
-                  Uploaded files are solely parsed as read-only binary streams through PyMuPDF; never executed.
-                </div>
-              </div>
-            </div>
+          </div>
+          <div className="d-flex gap-2">
+            <span className="badge bg-success-subtle text-success border border-success-subtle p-2">
+              <i className="bi bi-check-circle-fill me-1"></i> End-to-End Verified
+            </span>
+            <span className="badge bg-primary-subtle text-primary border border-primary-subtle p-2">
+              <i className="bi bi-shield-lock-fill me-1"></i> 100% Offline & Private
+            </span>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
