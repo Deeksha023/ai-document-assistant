@@ -1,10 +1,18 @@
+# DocuMind AI – AI Document Assistant (P07)
+
+> **THASMAI INFOTECH Internship Technical Talent Assessment**  
+> **Project ID:** P07 – AI Document Assistant  
+> **Author:** K DEEKSHA  
+
+---
+
 ## 1. Project Title
-**AI Document Assistant (P07)** – A full-stack document intelligence and retrieval web application that enables users to upload PDF documents, extract text page-by-page, perform TF-IDF keyword search, and ask questions with precise page citations.
+**DocuMind AI (P07)** – A full-stack document intelligence and retrieval web application that enables users to upload PDF documents, extract text page-by-page, perform TF-IDF keyword search, and ask questions through an interactive conversational chat interface with verifiable page citations.
 
 ---
 
 ## 2. Project Overview
-The **AI Document Assistant** is designed to eliminate manual reading across multi-page PDF documents. Users can upload standard PDF files, which the system validates, parses, and indexes page-by-page. Using Scikit-Learn TF-IDF vectorization and cosine similarity, the application retrieves relevant text passages and synthesizes direct answers to natural language questions with source document names and page numbers.
+**DocuMind AI** is designed to eliminate tedious manual reading across multi-page PDF documents. Users can upload standard PDF files, which the system validates, parses, and indexes page-by-page. Using Scikit-Learn TF-IDF vectorization and cosine similarity, the application retrieves relevant text passages and synthesizes direct answers to natural language questions with source document names and page numbers.
 
 If a query does not match any content in the uploaded documents, the application returns a clear, standard message:
 > *"No relevant information found in the uploaded documents."*
@@ -15,7 +23,22 @@ The application runs entirely locally with zero external paid APIs, cloud depend
 
 ## 3. Key Features
 
+- **Executive SaaS Dashboard**
+  - Live metric counters in a responsive 4-card grid: Total Documents, Pages Extracted, Words Processed, and Queries Run.
+  - Compact full-width horizontal welcome banner with quick-action buttons.
+  - Balanced two-column lower layout (65% Recent Documents table and 35% Live Query Activity feed with color-coded status pills).
+  - One-click sample document importer (`AI_and_Machine_Learning_Handbook.pdf` and `Thasmai_Company_Policy_2026.pdf`) for instant evaluation.
+
+- **Conversational AI Chat Interface (Ask AI)**
+  - Interactive chat stream with distinct user message bubbles and assistant response bubbles.
+  - Two-tier retrieval ranking (page-level filter followed by sentence-level scoring).
+  - Synthesizes direct extractive answers citing Document Name and exact Page Number.
+  - Expandable evidence snippets with keyword matching tags.
+  - Scope selector dropdown (`All Documents` vs specific PDF) and clear chat history action.
+  - Fallback protection: Displays *"No relevant information found in the uploaded documents."* when similarity falls below the confidence threshold.
+
 - **PDF Document Upload & Validation**
+  - Drag-and-drop file upload zone with active hover states.
   - Accepts standard PDF documents up to 25 MB.
   - Validates file extensions (`.pdf`) and binary magic byte headers (`%PDF-`).
   - Filename sanitization using `secure_filename()` with unique UUID prefixes to prevent directory traversal.
@@ -30,22 +53,17 @@ The application runs entirely locally with zero external paid APIs, cloud depend
   - Sublinear Term Frequency (TF) and Inverse Document Frequency (IDF) vectorization using Scikit-Learn.
   - Cosine similarity ranking across page segments.
   - Snippet generation with highlighted matching terms and relevance percentages.
+  - Scope filter and Top-K matches selector (5, 10, 20).
 
-- **Question & Answer Interface**
-  - Two-tier retrieval ranking (page-level filter followed by sentence-level scoring).
-  - Synthesizes direct extractive answers from top matching sentences.
-  - Explicit source attribution (Document Name and exact Page Number).
-  - Fallback protection: Displays *"No relevant information found in the uploaded documents."* when similarity falls below the confidence threshold.
-
-- **Document Management**
+- **Document Management Repository**
+  - Real-time search filter by document title.
   - View all indexed documents with page count, file size, word count, and upload date.
   - Page-by-page document reader modal to inspect extracted raw text.
   - Cascade deletion: Removes database records, extracted page text, and the physical PDF file.
 
-- **Executive Dashboard**
-  - Live metric counters: Total Documents, Pages Extracted, Words Processed, and Queries Run.
-  - One-click sample document importer (`AI_and_Machine_Learning_Handbook.pdf` and `Thasmai_Company_Policy_2026.pdf`) for instant evaluation.
-  - Recent documents list and live query activity feed.
+- **Dark Navy Sidebar & Navigation**
+  - Categorized navigation sections: `MAIN`, `DOCUMENTS`, `INTELLIGENCE`, and `INFORMATION`.
+  - Active blue glow pill indicators, live document count badge, and mobile drawer support.
 
 ---
 
@@ -139,7 +157,7 @@ ai-document-assistant/
     │
     └── src/
         ├── App.jsx                    # Root state coordinator
-        ├── App.css                    # Custom styles and design tokens
+        ├── App.css                    # SaaS design system and component styles
         ├── index.css                  # Global variables and typography
         ├── main.jsx                   # React DOM render entry point
         │
@@ -147,13 +165,13 @@ ai-document-assistant/
         │   ├── DocumentModal.jsx      # Page-by-page document text reader modal
         │   ├── Navbar.jsx             # Top bar with backend connectivity status
         │   ├── Notification.jsx       # Toast alert component
-        │   ├── Sidebar.jsx            # Navigation sidebar with badge counts
+        │   ├── Sidebar.jsx            # Categorized navigation sidebar with badge counts
         │   ├── SnippetCard.jsx        # Search result card with highlighted keywords
         │   └── StatCard.jsx           # Dashboard metric card
         │
         ├── pages/
         │   ├── AboutProject.jsx       # Project specifications and details
-        │   ├── AskAI.jsx              # Question answering interface with citations
+        │   ├── AskAI.jsx              # Conversational chat interface with citations
         │   ├── Dashboard.jsx          # Metric cards, quick actions, recent logs
         │   ├── MyDocuments.jsx        # Document repository table with filters
         │   ├── SearchDocuments.jsx    # TF-IDF keyword search page
@@ -221,11 +239,11 @@ npm run dev
 
 | Page | Description | Screenshot Preview |
 | :--- | :--- | :---: |
-| **Dashboard** | Overview of indexed documents, pages, queries, and quick actions. | ![Dashboard Screenshot](https://via.placeholder.com/800x450.png?text=Dashboard+View) |
+| **Executive Dashboard** | 4-Card statistics grid, welcome banner, recent documents, and query feed. | ![Dashboard Screenshot](https://via.placeholder.com/800x450.png?text=Dashboard+View) |
 | **Upload Documents** | Drag-and-drop PDF uploader with file validation and progress indicator. | ![Upload Screenshot](https://via.placeholder.com/800x450.png?text=Upload+Documents+View) |
 | **Document Reader Modal** | Granular page-by-page text inspection and word counts. | ![Document Modal Screenshot](https://via.placeholder.com/800x450.png?text=Document+Inspector+Modal) |
 | **TF-IDF Search** | Keyword and phrase search with matched token highlighting. | ![Search Screenshot](https://via.placeholder.com/800x450.png?text=TF-IDF+Search+Results) |
-| **Ask AI & Q&A** | Question answering with confidence score and page citations. | ![Ask AI Screenshot](https://via.placeholder.com/800x450.png?text=Ask+AI+Question+Answering) |
+| **Ask AI Chat** | Conversational chat interface with confidence score and page citations. | ![Ask AI Screenshot](https://via.placeholder.com/800x450.png?text=Ask+AI+Question+Answering) |
 
 *(Note: Replace placeholder image links with actual screenshots of your running instance as needed.)*
 
@@ -332,10 +350,10 @@ Follow these steps for a 2-minute demonstration:
 4. **Run a Search Query**: Navigate to **Search Documents**, enter `"transformers attention mechanism"`, and review the ranked snippets with highlighted matching words and page badges.
 5. **Ask a Valid Question**: Navigate to **Ask AI** and query:
    - *"What are the standard working hours at Thasmai?"*  
-   - Observe the synthesized answer citing **Page 1** of `Thasmai_Company_Policy_2026.pdf`.
+   - Observe the conversational assistant bubble citing **Page 1** of `Thasmai_Company_Policy_2026.pdf`.
 6. **Verify Fallback Behavior**: In **Ask AI**, ask an unrelated query:
    - *"What is the recipe for chocolate cake?"*  
-   - Observe the required fallback:  
+   - Observe the required fallback card:  
      **"No relevant information found in the uploaded documents."**
 
 ---
